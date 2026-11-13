@@ -1,6 +1,6 @@
 {
   "name": "reach",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "description": "Find and message coding agents by a stable address: machine/space/name.",
   "license": "MIT",

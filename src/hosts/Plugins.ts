@@ -2,7 +2,7 @@ import { join } from "node:path"
 import { Effect, FileSystem, Option, Schema } from "effect"
 import { type Agent, Address, addressOf, baseName, slug, statusOf } from "../Agent.ts"
 import { Config } from "../Config.ts"
-import { cannotReopen, type Host, HostError } from "../Host.ts"
+import { cannotPin, cannotReopen, type Host, HostError } from "../Host.ts"
 import { Shell } from "../Shell.ts"
 
 const Listed = Schema.fromJsonString(
@@ -85,7 +85,7 @@ export const plugins = Effect.gen(function* () {
       return yield* call(["read", agent.id, String(lines)])
     })
 
-    return { name: host, list, send, read, reopen: cannotReopen(host) }
+    return { name: host, list, send, read, reopen: cannotReopen(host), pin: cannotPin(host) }
   }
 
   return unique.map(plugin)

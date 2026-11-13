@@ -88,9 +88,27 @@ const reopen = Command.make("reopen", { target }, ({ target }) =>
   })
 ).pipe(Command.withDescription("Start an ended agent again with its own session, where its host can"))
 
+const pin = Command.make(
+  "pin",
+  {
+    target,
+    to: Argument.String("new-address").pipe(Argument.withDescription("machine/space/name or space/name to keep it at"))
+  },
+  ({ target, to }) =>
+    Effect.gen(function* () {
+      const directory = yield* Directory
+      const agent = yield* directory.pin(target, to)
+      yield* Console.log(`${target} is now pinned at ${agent.address}`)
+    })
+).pipe(
+  Command.withDescription(
+    "Give an agent the address it keeps from now on (renaming its tab or terminal never moves it)"
+  )
+)
+
 const reach = Command.make("reach").pipe(
   Command.withDescription("Find and message coding agents by a stable address: machine/space/name"),
-  Command.withSubcommands([ls, resolve, send, read, reopen])
+  Command.withSubcommands([ls, resolve, send, read, reopen, pin])
 )
 
 const services = Directory.layer.pipe(Layer.provide(Shell.layer), Layer.provideMerge(BunServices.layer))

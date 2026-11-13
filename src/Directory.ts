@@ -5,7 +5,7 @@ import { type Host, HostError } from "./Host.ts"
 import { herdrApp } from "./hosts/HerdrApp.ts"
 import { plugins } from "./hosts/Plugins.ts"
 import { tmux } from "./hosts/Tmux.ts"
-import { type Ambiguous, type BadAddress, type Ended, NotFound, parseTarget, pick } from "./Resolve.ts"
+import { type Ambiguous, type BadAddress, type Ended, NotFound, parseTarget, pick, Taken } from "./Resolve.ts"
 
 type Listing = { readonly agents: ReadonlyArray<Agent>; readonly problems: ReadonlyArray<HostError> }
 type Unresolved = BadAddress | NotFound | Ambiguous | Ended
@@ -18,6 +18,7 @@ export class Directory extends Context.Service<
     send(target: string, text: string): Effect.Effect<Agent, Unresolved | HostError>
     read(target: string, lines: number): Effect.Effect<string, Unresolved | HostError>
     reopen(target: string): Effect.Effect<string, BadAddress | NotFound | HostError>
+    pin(target: string, to: string): Effect.Effect<Agent, Unresolved | Taken | HostError>
   }
 >()("reach/Directory") {
   static readonly layerNoDeps = Layer.effect(
@@ -78,7 +79,27 @@ export class Directory extends Context.Service<
         return yield* host.reopen(ended)
       })
 
-      return Directory.of({ list, resolve, send, read, reopen })
+      const pin = Effect.fn("Directory.pin")(function* (target: string, to: string) {
+        const agent = yield* resolve(target)
+        const address = yield* parseTarget(to, agent.machine)
+        const [machine, space = "", name = ""] = address.split("/")
+        if (machine !== agent.machine) {
+          return yield* new Taken({
+            address,
+            message: `${agent.address} runs on ${agent.machine}; a pin can't move it to ${machine}`
+          })
+        }
+        const { agents } = yield* list
+        const holder = agents.find(
+          (other) => other.address === address && other.state !== "ended" && other.id !== agent.id
+        )
+        if (holder) return yield* new Taken({ address, message: `${address} is already ${holder.host}:${holder.id}` })
+        const host = yield* hostOf(agent)
+        yield* host.pin(agent, space, name)
+        return { ...agent, address, space, name, pinned: true }
+      })
+
+      return Directory.of({ list, resolve, send, read, reopen, pin })
     })
   )
 

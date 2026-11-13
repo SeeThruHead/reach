@@ -70,5 +70,10 @@ export const tmux = Effect.gen(function* () {
     return yield* tmuxRun(["capture-pane", "-p", "-t", agent.id, "-S", String(-lines)])
   })
 
-  return { name: HOST, list, send, read, reopen: cannotReopen(HOST) } satisfies Host
+  const pin = Effect.fn("Tmux.pin")(function* (agent: Agent, space: string, name: string) {
+    yield* tmuxRun(["set-option", "-p", "-t", agent.id, "@agent", name])
+    yield* tmuxRun(["set-option", "-p", "-t", agent.id, "@space", space])
+  })
+
+  return { name: HOST, list, send, read, reopen: cannotReopen(HOST), pin } satisfies Host
 })

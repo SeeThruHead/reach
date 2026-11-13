@@ -23,6 +23,11 @@ export class Ended extends Schema.TaggedError<Ended>()("Ended", {
   message: Schema.String
 }) {}
 
+export class Taken extends Schema.TaggedError<Taken>()("Taken", {
+  address: Schema.String,
+  message: Schema.String
+}) {}
+
 const part = /^[a-z0-9._-]+$/
 
 export const parseTarget = Effect.fnUntraced(function* (target: string, machine: string) {

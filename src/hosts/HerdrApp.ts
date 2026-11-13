@@ -182,5 +182,9 @@ export const herdrApp = Effect.gen(function* () {
     return `reopened ${agent.address} with ${agent.resume.join(" ")}; Threads gives it its address back within a minute`
   })
 
-  return { name: HOST, list, send, read, reopen } satisfies Host
+  const pin = Effect.fn("HerdrApp.pin")(function* (agent: Agent, space: string, name: string) {
+    yield* hc(["label", agent.id, `sth.agent=${name}`, `sth.space=${space}`])
+  })
+
+  return { name: HOST, list, send, read, reopen, pin } satisfies Host
 })

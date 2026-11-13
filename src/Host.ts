@@ -12,7 +12,11 @@ export type Host = {
   readonly send: (agent: Agent, text: string) => Effect.Effect<void, HostError>
   readonly read: (agent: Agent, lines: number) => Effect.Effect<string, HostError>
   readonly reopen: (agent: Agent) => Effect.Effect<string, HostError>
+  readonly pin: (agent: Agent, space: string, name: string) => Effect.Effect<void, HostError>
 }
+
+export const cannotPin = (host: string) => (agent: Agent) =>
+  Effect.fail(new HostError({ host, message: `${host} has nowhere to keep a pin for ${agent.address}` }))
 
 export const cannotReopen = (host: string) => (agent: Agent) =>
   Effect.fail(new HostError({ host, message: `${host} can't reopen ${agent.address}; start it again by hand` }))

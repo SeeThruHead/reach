@@ -13,6 +13,7 @@ reach resolve <address> [--json]       the one agent at that address, or why the
 reach send <address> [message]         deliver a message (from stdin when left out)
 reach read <address> [--lines 40]      the bottom of its screen
 reach reopen <address>                 start an ended agent again with its own session
+reach pin <address> <new-address>      give an agent the address it keeps from now on
 ```
 
 `space/name` means that space on this machine.
@@ -39,7 +40,7 @@ and exits 1. Other tools build on that.
 `reach ls` marks each address `pinned` or `guessed`. Guessed addresses work, and two agents that guess the same
 address are refused rather than mixed up. Pin them to make them stable: in the Herdr app the Threads mod pins
 every agent when it first sees it, and keeps the pin by session id when the agent comes back in a new terminal.
-In tmux, `tmux set -p @agent reviewer; tmux set -p @space api`.
+Change a pin with `reach pin <address> <new-address>`; renaming a tab or terminal never moves it.
 
 ## Plugins
 
