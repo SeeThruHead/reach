@@ -1,0 +1,36 @@
+{
+  "name": "reach",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Find and message coding agents by a stable address: machine/space/name.",
+  "license": "MIT",
+  "bin": {
+    "reach": "src/main.ts"
+  },
+  "type": "module",
+  "scripts": {
+    "prepare": "effect-tsgo patch && lefthook install",
+    "dev": "bun run src/main.ts",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "lint": "oxlint --deny-warnings src",
+    "format": "oxfmt",
+    "format:check": "oxfmt --check",
+    "test": "bun --bun vitest run",
+    "check": "bun run format:check && bun run lint && bun run typecheck && bun run test",
+    "build": "bun build --compile src/main.ts --outfile dist/reach"
+  },
+  "dependencies": {
+    "@effect/platform-bun": "4.1.4",
+    "effect": "4.1.4"
+  },
+  "devDependencies": {
+    "@effect/tsgo": "0.69.0",
+    "@effect/vitest": "4.1.4",
+    "@types/bun": "1.4.3",
+    "lefthook": "2.2.2",
+    "oxfmt": "0.73.0",
+    "oxlint": "1.91.0",
+    "typescript": "7.0.2",
+    "vitest": "5.0.5"
+  }
+}
